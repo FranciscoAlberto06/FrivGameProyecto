@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="FrivGame_Minijuegos_FAFA_APP.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:FrivGame_Minijuegos_FAFA_APP"
+    Title="FrivGame_Minijuegos_FAFA_APP">
+    <FlyoutItem Title="Topos">
+        <ShellContent 
+      Title="Topos "
+      ContentTemplate="{DataTemplate local:JuegoTopos}"
+      Route=""/>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Palabra">
+        <ShellContent 
+      Title="Palabra"
+      ContentTemplate="{DataTemplate local:AdivinaPalabra}"
+      Route=""/>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Palabra V2">
+        <ShellContent 
+    Title="Palabra V2"
+    ContentTemplate="{DataTemplate local:AdivinarLaPalabra2}"
+    Route="relacion11_sqlite"/>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Inicio De Sesion">
+        <ShellContent 
+    Title=""
+    ContentTemplate="{DataTemplate local:PageInicioSesion}"
+    Route="relacion11_sqlite"/>
+    </FlyoutItem>
+
+</Shell>
