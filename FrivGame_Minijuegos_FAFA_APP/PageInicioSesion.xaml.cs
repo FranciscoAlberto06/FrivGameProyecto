@@ -33,4 +33,9 @@ public partial class PageInicioSesion : ContentPage
         // Fade in del login
         await LoginContainer.FadeTo(1, 800);
     }
+
+    private async void botonInico(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new MenuJuegos());
+    }
 }

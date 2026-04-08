@@ -184,7 +184,7 @@ public partial class JuegoTopos : ContentPage
             nuevoPuntaje = puntosActuales - 10;
         }
 
-        // Actualización de la puntuacion
+        // Actualización de la puntuacion inutil
         lbPuntaje.Text = "Puntos: " + nuevoPuntaje.ToString();
 
     }

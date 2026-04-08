@@ -1,5 +1,8 @@
 ﻿
 using BGestionFAFA;
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Devices;
 using System.Linq.Expressions;
 using System.Text.Json;
 
@@ -51,11 +54,14 @@ public partial class AdivinarLaPalabra2 : ContentPage
     public AdivinarLaPalabra2()
     {
         InitializeComponent();
-        
+
+
         ComprobarInternet(); // Comprobamos si hay conexion a internet para cargar la palabra de forma online o offline
         CrearTablero(); // Creamos el tablero adaptandose a la palabra objetivo
         CrearTeclado(); // Creamos el teclado con sus botones y su funcionalidad
     }
+
+
 
     private void RecargarJuego(object sender, EventArgs e)
     {
@@ -80,54 +86,20 @@ public partial class AdivinarLaPalabra2 : ContentPage
         if (accesoRed == NetworkAccess.Internet)
         {
             // Si hay internet, ejecutamos el método online
-            CargarPalabraOnline();
+            //CargarPalabraOnline();
+            PalabraSecreta = ApiWordle.ObtenerPalabraAleatoria(); // Quitamos los acentos de la palabra secreta para que no haya problemas al comparar con el intento del usuario
         }
         else
         {
             // Si no hay internet, ejecutamos el método offline
-            CargarPalabraOffline();
+            //CargarPalabraOffline();
+            PalabraSecreta = ApiWordle.CargarPalabraOffline();
         }
     }
 
-    private void CargarPalabraOffline()
-    {
-        // Creamos un listado de palabras local para cuando no haya conexion a internet
-        string[] diccionarioLocal = { "CODIGO", "MAUI", "MOVIL", "JUEGO", "PERRO", "PLATO" };
-
-        Random azar = new Random();
-
-        // Seleccionamos una palabra random dentro del rango de opcione que tiene nuestro array
-        PalabraSecreta = diccionarioLocal[azar.Next(diccionarioLocal.Length)];
-
-    }
-
-    private void CargarPalabraOnline()
-    {
-
-        try
-        {
-
-            // Llamamo al metodo de nuestra api que nos va a suministrar una palabra aleatoria de la RAE
-            string palabraExtraida = ApiWordle.ExtraerPalabraRAE();
 
 
 
-            // Guardamos en nuestras propiedad en mayuscula y reemplazando las vocales acentuadas por la vocal sin acento correspondiente 
-            PalabraSecreta = palabraExtraida.ToUpper()
-                                            .Replace("Á", "A")
-                                            .Replace("É", "E")
-                                            .Replace("Í", "I")
-                                            .Replace("Ó", "O")
-                                            .Replace("Ú", "U")
-                                            .Replace("Ü", "U");
-        }
-        catch (Exception ex)
-        {
-      
-            DisplayAlert("ERROR", "Conexion Fallida", "Aceptar ");
-
-        }
-    }
 
 
 
@@ -167,6 +139,8 @@ public partial class AdivinarLaPalabra2 : ContentPage
                     WidthRequest = 60,
                     Content = etiqueta // Metemos el texto dentro del cuadro el label
                 };
+
+
 
                 // 3. Añadimos a nuestra propieda public las celdas añadidas para poder acceder a ellas desde cualquier parte de la clase, por ejemplo para cambiar el texto del label o el color del borde
                 Celdas[fila, c] = cuadro;
@@ -230,9 +204,11 @@ public partial class AdivinarLaPalabra2 : ContentPage
                     TextColor = Colors.Black,
                     CornerRadius = 5,
                     Padding = 0, // Añadido para que el texto largo no se corte
-                    FontSize = 14
-                };
+                    FontSize = 14,
 
+        
+                };
+ 
                 // Añadimos a cada boton un evento centralizado para cuando se pulse cualquiera tecla se gestione desde el mismo metodo
                 botonNuevo.Clicked += (s, e) => PresionarTecla(botonNuevo);
 
@@ -327,63 +303,73 @@ public partial class AdivinarLaPalabra2 : ContentPage
 
     }
 
+    // TODO: MEJORAR EN LA VALIDACION LA REPETICION DE LETRAS, PORQUE SI HAY LETRAS REPETIDAS EN LA PALABRA SECRETA NO SE ESTA VALIDANDO BIEN,
+    // PORQUE SI LA LETRA EXISTE EN LA PALABRA PERO YA SE HA VALIDADO ANTERIORMENTE COMO VERDE O AMARILLA, LAS SIGUIENTES VECES QUE APAREZCA ESA LETRA NO SE DEBERIA VALIDAR O DEBERIA VALIDAR COMO GRIS,
+    // PERO AHORA MISMO SI HAY UNA LETRA REPETIDA EN LA PALABRA SECRETA Y EL USUARIO ESCRIBE ESA LETRA EN SU INTENTO, SIEMPRE SE VA A VALIDAR COMO AMARILLA O VERDE DEPENDIENDO DE SI ESTA EN LA POSICION CORRECTA O NO,
+    // PERO NO SE ESTA TENIENDO EN CUENTA SI ESA LETRA YA SE HA VALIDADO ANTERIORMENTE Y YA NO QUEDAN MAS INSTANCIAS DE ESA LETRA POR VALIDAR
     private async void ValidarPalabra()
-    {      
-
-        // 1. Recorremos cada letra usando directamente el largo de la palabra secreta
-        for (int i = 0; i < PalabraSecreta.Length; i++)
-        {
-            // Nos situamos en la fila que estamos ahora y vamos a recorrer sus columnas gracias a indice 
-            Border border = Celdas[FilaActual, i];
-
-            // Sacamos el label de la celda para comprobar la letra que hay escrita y para cambiar su color dependiendo del resultado de la comparación
-            Label label = (Label)border.Content;
-
-
-            // Comparamos la letra del intento con la de la palabra secreta
-            char letraIntento = IntentoPalabraActual[i];
-
-            // Animacion que girda las palabras una detras de otra 
-            await border.RotateYTo(90, 150);
-
-            // Comprobamos la letra actual escrita, con la de la misma posicion que hay en la palabra
-            // Si es igual la ponemos de color verde
-            if (letraIntento == PalabraSecreta[i])
-            {
-                // VERDE: Posición exacta
-                border.BackgroundColor = Colors.Green;
-                border.Stroke = Colors.Green;
-            }
-            else if (PalabraSecreta.Contains(letraIntento)) // Sino es igual, pero la letra existe en la palabra secreta, la ponemos de color amarillo
-            {
-                // AMARILLO: Existe pero en otro sitio
-                border.BackgroundColor = Colors.Gold;
-                border.Stroke = Colors.Gold;
-            }
-            else
-            {
-                // GRIS: No existe
-                border.BackgroundColor = Colors.Gray;
-                border.Stroke = Colors.Gray;
-            }
-
-            // Cambiamos el color de todos
-            label.TextColor = Colors.White;
-
-            // Animación de giro
-            await border.RotateYTo(0, 150);
-        }
-
+    {
         try
         {
+            // Comprobamos si la palabra escrita existe en el diccionario, si no existe se lanzará una excepción que se capturará en el catch para mostrar un mensaje de error al usuario
+            if (!ApiWordle.ComprobarSiExiste(IntentoPalabraActual))
+            {
+                LabelMensaje.TextColor = Colors.Green;
+                throw new Exception("La palabra no existe en el diccionario, prueba con otra palabra");
+            }
+
+
+            // 1. Recorremos cada letra usando directamente el largo de la palabra secreta
+            for (int i = 0; i < PalabraSecreta.Length; i++)
+            {
+                // Nos situamos en la fila que estamos ahora y vamos a recorrer sus columnas gracias a indice 
+                Border border = Celdas[FilaActual, i];
+
+                // Sacamos el label de la celda para comprobar la letra que hay escrita y para cambiar su color dependiendo del resultado de la comparación
+                Label label = (Label)border.Content;
+
+
+                // Comparamos la letra del intento con la de la palabra secreta
+                char letraIntento = IntentoPalabraActual[i];
+
+                // Animacion que girda las palabras una detras de otra 
+                await border.RotateYTo(90, 150);
+
+                // Comprobamos la letra actual escrita, con la de la misma posicion que hay en la palabra
+                // Si es igual la ponemos de color verde
+                if (letraIntento == PalabraSecreta[i])
+                {
+                    // VERDE: Posición exacta
+                    border.BackgroundColor = Colors.Green;
+                    border.Stroke = Colors.Green;
+                }
+                else if (PalabraSecreta.Contains(letraIntento)) // Sino es igual, pero la letra existe en la palabra secreta, la ponemos de color amarillo
+                {
+                    // AMARILLO: Existe pero en otro sitio
+                    border.BackgroundColor = Colors.Gold;
+                    border.Stroke = Colors.Gold;
+                }
+                else
+                {
+                    // GRIS: No existe
+                    border.BackgroundColor = Colors.Gray;
+                    border.Stroke = Colors.Gray;
+                }
+
+                // Cambiamos el color de todos
+                label.TextColor = Colors.White;
+
+                // Animación de giro
+                await border.RotateYTo(0, 150);
+            }
+ 
             // 2. Comprobar resultado final usando las propiedades y actualizando el Label de la interfaz
             if (IntentoPalabraActual == PalabraSecreta)
             {
                 LabelMensaje.TextColor = Colors.Green;
-
+                KeyboardLayout.IsEnabled = false; // Deshabilitamos el teclado para que no pueda seguir escribiendo al haber ganado
+                ButtonReiniciar.IsVisible = true; // Hacemos visible el boton de reiniciar para que pueda volver a jugar
                 throw new Exception("¡ENHORABUENA! HAS ACERTADO!");
-                
-
             }
             else
             {
@@ -395,7 +381,10 @@ public partial class AdivinarLaPalabra2 : ContentPage
                 if (FilaActual == 6)
                 {
                     LabelMensaje.TextColor = Colors.Red;
+                    KeyboardLayout.IsEnabled = false; // Deshabilitamos el teclado para que no pueda seguir escribiendo al haber ganado
+                    ButtonReiniciar.IsVisible = true; // Hacemos visible el boton de reiniciar para que pueda volver a jugar
                     throw new Exception("FIN DEL JUEGO. LA PALABRA ERA: " + PalabraSecreta);
+
 
                 }
                 else
@@ -409,11 +398,10 @@ public partial class AdivinarLaPalabra2 : ContentPage
         catch (Exception error) { 
         
             LabelMensaje.Text = error.Message;
-            KeyboardLayout.IsEnabled = false; // Deshabilitamos el teclado para que no pueda seguir escribiendo al haber ganado
-            ButtonReiniciar.IsVisible = true; // Hacemos visible el boton de reiniciar para que pueda volver a jugar
+            
 
         }
     }
 
-  
+
 }

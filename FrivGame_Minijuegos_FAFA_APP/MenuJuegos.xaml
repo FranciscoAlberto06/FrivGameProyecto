@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FrivGame_Minijuegos_FAFA_APP.MenuJuegos"
+             Title="MenuJuegos">
+    <ScrollView VerticalOptions="Center">
+        <Grid x:Name="MenuGrid" 
+              HorizontalOptions="Center" 
+              Padding="40" 
+              ColumnSpacing="30"
+              RowSpacing="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="250" />
+            </Grid.ColumnDefinitions>
+
+        </Grid>
+    </ScrollView>
+</ContentPage>

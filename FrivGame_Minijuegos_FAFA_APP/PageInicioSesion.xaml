@@ -86,6 +86,7 @@
                         BackgroundColor="#6366F1"
                         TextColor="White"
                         FontAttributes="Bold"
+                        Clicked="botonInico"
                         />
 
                 </VerticalStackLayout>

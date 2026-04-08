@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FrivGame_Minijuegos_FAFA_APP.BuscarParejas"
+             Title="BuscarParejas">
+
+    <VerticalStackLayout Padding="20" Spacing="20">
+
+        <Label x:Name="LblEstado" Text="¡Encuentra las parejas!" FontSize="20" HorizontalOptions="Center" FontAttributes="Bold"/>
+
+        <Grid x:Name="GridTablero" ColumnSpacing="10" RowSpacing="10" HorizontalOptions="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="80"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+
+        </Grid>
+
+        <Button Text="Reiniciar Juego" Clicked="ReiniciarJuego" BackgroundColor="Purple" HorizontalOptions="Center"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>
